@@ -2,11 +2,11 @@
 
 interface User {
   id: string
-  nome: string
+  name: string
   email: string
   avatar: string
-  cargo: string
-  departamento: string
+  role: string
+  department: string
 }
 
 interface AppProps {

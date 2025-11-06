@@ -1,23 +1,23 @@
 # Remote Application - Module Federation
 
-Este é o projeto **Remote** configurado com:
+This is the **Remote** project configured with:
 
 - ⚡ **Vite** - Build tool
 - ⚛️ **React 19** - Framework
 - 📘 **TypeScript** - Type safety
 - 🎨 **Tailwind CSS** - Styling
 - 🔧 **ESLint** - Code quality
-- 🔗 **Module Federation** - Expondo componentes para outros apps
+- 🔗 **Module Federation** - Exposing components to other apps
 
-## 🚀 Como usar
+## 🚀 How to use
 
-### Desenvolvimento
+### Development
 
 ```bash
 npm run dev
 ```
 
-O app estará disponível em `http://localhost:5001`
+The app will be available at `http://localhost:5001`
 
 ### Build
 
@@ -29,22 +29,22 @@ npm run build
 
 ```bash
 npm run preview
-# ou
+# or
 npm run serve
 ```
 
 ## 📦 Module Federation - Remote
 
-Este projeto está configurado como **Remote** e expõe componentes para serem consumidos por aplicações Host.
+This project is configured as a **Remote** and exposes components to be consumed by Host applications.
 
-### Componentes Expostos
+### Exposed Components
 
-Este remote expõe os seguintes componentes:
+This remote exposes the following components:
 
 ```typescript
 exposes: {
-  './App': './src/App.tsx',           // Componente principal
-  './Button': './src/components/Button.tsx',  // Componente Button reutilizável
+  './App': './src/App.tsx',           // Main component
+  './Button': './src/components/Button.tsx',  // Reusable Button component
 }
 ```
 
@@ -54,9 +54,9 @@ exposes: {
 http://localhost:5001/assets/remoteEntry.js
 ```
 
-### Como consumir este remote
+### How to consume this remote
 
-No projeto **Host**, configure o `vite.config.ts`:
+In the **Host** project, configure `vite.config.ts`:
 
 ```typescript
 federation({
@@ -68,16 +68,16 @@ federation({
 })
 ```
 
-E use os componentes:
+And use the components:
 
 ```typescript
 import { lazy, Suspense } from 'react';
 
-// Importar componentes do remote
+// Import components from remote
 const RemoteApp = lazy(() => import('remote/App'));
 const RemoteButton = lazy(() => import('remote/Button'));
 
-// Usar no seu componente
+// Use in your component
 function MyComponent() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -90,27 +90,27 @@ function MyComponent() {
 }
 ```
 
-## 📁 Estrutura do Projeto
+## 📁 Project Structure
 
 ```
 remote/
 ├── src/
 │   ├── components/
-│   │   └── Button.tsx   # Componente exposto
-│   ├── App.tsx          # Componente principal exposto
+│   │   └── Button.tsx   # Exposed component
+│   ├── App.tsx          # Main exposed component
 │   ├── main.tsx         # Entry point
 │   └── index.css        # Tailwind imports
-├── vite.config.ts       # Configuração Vite + Federation (Remote)
-├── tailwind.config.js   # Configuração Tailwind
-├── tsconfig.json        # Configuração TypeScript
-└── .eslintrc.cjs        # Configuração ESLint
+├── vite.config.ts       # Vite + Federation config (Remote)
+├── tailwind.config.js   # Tailwind config
+├── tsconfig.json        # TypeScript config
+└── .eslintrc.cjs        # ESLint config
 ```
 
-## 🎨 Componentes
+## 🎨 Components
 
 ### Button
 
-Componente de botão reutilizável com variantes:
+Reusable button component with variants:
 
 ```tsx
 <Button variant="primary" onClick={handleClick}>
@@ -136,11 +136,11 @@ Componente de botão reutilizável com variantes:
 npm run lint
 ```
 
-## 📝 Notas
+## 📝 Notes
 
-- Roda na porta **5001** para evitar conflito com o host
-- CORS habilitado para permitir consumo por outros apps
-- Componentes otimizados para compartilhamento via Module Federation
-- TypeScript strict mode habilitado
-- Tailwind com JIT mode para builds otimizadas
+- Runs on port **5001** to avoid conflicts with the host
+- CORS enabled to allow consumption by other apps
+- Components optimized for sharing via Module Federation
+- TypeScript strict mode enabled
+- Tailwind with JIT mode for optimized builds
 ```
