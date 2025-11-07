@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
-import Button from '../components/Button'
+import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import SharedCounter from '../components/SharedCounter'
 
 interface User {
     id: string
@@ -13,16 +14,22 @@ interface User {
 interface HomePageProps {
     authToken?: string | null
     authUser?: User | null
+    sharedCount?: number
+    onIncrement?: () => void
+    onDecrement?: () => void
 }
 
-const HomePage = ({ authToken, authUser }: HomePageProps) => {
-    const [count, setCount] = useState(0)
-
+const HomePage = ({ authToken, authUser, sharedCount, onIncrement, onDecrement }: HomePageProps) => {
+    const { t } = useTranslation()
     useEffect(() => {
-        console.log('🔐 [REMOTE] Props received from Host:')
-        console.log('Token:', authToken)
-        console.log('User:', authUser)
-    }, [authToken, authUser])
+        console.log('[REMOTE] Props from Host updated:', {
+            hasAuthToken: !!authToken,
+            hasUser: !!authUser,
+            sharedCount,
+            hasOnIncrement: typeof onIncrement === 'function',
+            hasOnDecrement: typeof onDecrement === 'function',
+        })
+    }, [authToken, authUser, sharedCount, onIncrement, onDecrement])
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-6">
@@ -30,17 +37,17 @@ const HomePage = ({ authToken, authUser }: HomePageProps) => {
                 <div className="text-center py-8">
                     <div className="inline-block">
                         <h1 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-3">
-                            🚀 Remote App
+                            🚀 {t('remote_title')}
                         </h1>
                         <p className="text-lg text-gray-600">
-                            Sharing components via <span className="font-semibold text-purple-600">Module Federation</span>
+                            {t('mf_sharing')}
                         </p>
                     </div>
                 </div>
 
                 {authToken && authUser ? (
                     <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-3xl shadow-xl border-2 border-green-300 p-8">
-                        <h2 className="text-3xl font-bold text-gray-800 mb-4">🎉 Token Received from Host!</h2>
+                        <h2 className="text-3xl font-bold text-gray-800 mb-4">🎉 {t('token_received')}</h2>
                         <p className="text-gray-600 mb-6">
                             The remote is authenticated and received data via Module Federation
                         </p>
@@ -77,7 +84,7 @@ const HomePage = ({ authToken, authUser }: HomePageProps) => {
                     </div>
                 ) : (
                     <div className="bg-gradient-to-br from-yellow-50 to-orange-100 rounded-3xl shadow-xl border-2 border-yellow-300 p-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">⚠️ Not Authenticated</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">⚠️ {t('not_authenticated')}</h2>
                         <p className="text-gray-700 mb-3">
                             The remote did not receive token from host. Please log in on the Home page first!
                         </p>
@@ -89,46 +96,23 @@ const HomePage = ({ authToken, authUser }: HomePageProps) => {
                     </div>
                 )}
 
-                <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-purple-100 p-8 hover:shadow-2xl transition-shadow duration-300">
-                    <div className="flex items-start gap-4 mb-6">
+                <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-purple-100 p-8 hover:shadow-2xl transition-shadow duration-300 space-y-6">
+                    <div className="flex items-start gap-4 mb-2">
                         <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-3 shadow-lg">
                             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
                         </div>
                         <div>
-                            <h2 className="text-3xl font-bold text-gray-800">Interactive Counter</h2>
-                            <p className="text-gray-500 mt-1">Exposed component ready to use!</p>
+                            <h2 className="text-3xl font-bold text-gray-800">{t('shared_counter')}</h2>
+                            <p className="text-gray-500 mt-1">{t('shared_counter_desc')}</p>
                         </div>
                     </div>
-
-                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8">
-                        <p className="text-center text-gray-600 mb-6">
-                            Try it out! Click the buttons and watch the magic happen ✨
-                        </p>
-                        <div className="flex items-center justify-center gap-6">
-                            <Button
-                                onClick={() => setCount((count) => count - 1)}
-                                variant="danger"
-                            >
-                                <span className="text-2xl font-bold">−</span>
-                            </Button>
-                            <div className="relative">
-                                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl blur-xl opacity-50"></div>
-                                <div className="relative bg-white rounded-2xl px-12 py-6 shadow-lg">
-                                    <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
-                                        {count}
-                                    </span>
-                                </div>
-                            </div>
-                            <Button
-                                onClick={() => setCount((count) => count + 1)}
-                                variant="success"
-                            >
-                                <span className="text-2xl font-bold">+</span>
-                            </Button>
-                        </div>
-                    </div>
+                    <SharedCounter 
+                        value={sharedCount}
+                        onIncrement={onIncrement}
+                        onDecrement={onDecrement}
+                    />
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
@@ -170,7 +154,7 @@ const HomePage = ({ authToken, authUser }: HomePageProps) => {
                                 </svg>
                             </div>
                             <div className="flex-1">
-                                <h3 className="font-bold text-lg text-gray-800 mb-2">🔗 Remote Endpoint</h3>
+                                <h3 className="font-bold text-lg text-gray-800 mb-2">🔗 {t('endpoint')}</h3>
                                 <p className="text-sm text-gray-600 mb-3">
                                     Use this link in your host to consume the components:
                                 </p>
