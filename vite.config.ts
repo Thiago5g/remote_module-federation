@@ -36,23 +36,11 @@ export default defineConfig({
   server: {
     port: 5001,
     strictPort: true,
-    cors: {
-      origin: [
-        'http://localhost:5173',
-        'https://host-module-federation.vercel.app'
-      ],
-      credentials: true
-    }
+    cors: true
   },
   preview: {
     port: 5001,
     strictPort: true,
-    cors: {
-      origin: [
-        'http://localhost:5173',
-        'https://host-module-federation.vercel.app'
-      ],
-      credentials: true
-    }
+    cors: true
   }
 })
