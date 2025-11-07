@@ -1,8 +1,15 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import federation from '@originjs/vite-plugin-federation'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const hostUrl = env.VITE_HOST_APP_URL || 'http://localhost:5173'
+  const hostEntry = `${hostUrl}/assets/remoteEntry.js`
+
+  console.log('🔐 Allowed CORS Origin (remote):', hostUrl)
+
+  return {
   plugins: [
     react(),
     federation({
@@ -12,7 +19,10 @@ export default defineConfig({
         './App': './src/App.tsx',
         './Button': './src/components/Button.tsx',
       },
-      shared: ['react', 'react-dom'],
+      remotes: {
+        host: hostEntry
+      },
+      shared: ['react', 'react-dom', 'zustand'],
       
     }),
     {
@@ -36,11 +46,12 @@ export default defineConfig({
   server: {
     port: 5001,
     strictPort: true,
-    cors: true
+    cors: { origin: hostUrl, credentials: true }
   },
   preview: {
     port: 5001,
     strictPort: true,
-    cors: true
+    cors: { origin: hostUrl, credentials: true }
   }
+}
 })
