@@ -1,14 +1,8 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import federation from '@originjs/vite-plugin-federation'
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
-  const hostUrl = env.VITE_HOST_APP_URL || 'http://localhost:5173'
-  const hostEntry = `${hostUrl}/assets/remoteEntry.js`
-  const allowedOrigin = env.VITE_ALLOWED_ORIGIN || 'http://localhost:5173'
-
-  return {
+export default defineConfig({
   plugins: [
     react(),
     federation({
@@ -18,10 +12,7 @@ export default defineConfig(({ mode }) => {
         './App': './src/App.tsx',
         './Button': './src/components/Button.tsx',
       },
-      remotes: {
-        host: hostEntry
-      },
-      shared: ['react', 'react-dom', 'zustand'],
+      shared: ['react', 'react-dom'],
       
     }),
     {
@@ -45,12 +36,23 @@ export default defineConfig(({ mode }) => {
   server: {
     port: 5001,
     strictPort: true,
-    cors: { origin: allowedOrigin, credentials: true }
+    cors: {
+      origin: [
+        'http://localhost:5173',
+        'https://host-module-federation.vercel.app'
+      ],
+      credentials: true
+    }
   },
   preview: {
     port: 5001,
     strictPort: true,
-    cors: { origin: allowedOrigin, credentials: true }
+    cors: {
+      origin: [
+        'http://localhost:5173',
+        'https://host-module-federation.vercel.app'
+      ],
+      credentials: true
+    }
   }
-}
 })
