@@ -1,8 +1,17 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import federation from '@originjs/vite-plugin-federation'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const allowed = (env.VITE_ALLOWED_ORIGINS || 'http://localhost:5173,https://host-module-federation.vercel.app')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+
+  console.log('🔐 Allowed CORS origins:', allowed)
+
+  return {
   plugins: [
     react(),
     federation({
@@ -16,11 +25,23 @@ export default defineConfig({
       
     }),
     {
-      name: 'cors-logger',
+      name: 'dynamic-cors',
       configureServer(server) {
-        server.middlewares.use((req, _res, next) => {
+        server.middlewares.use((req, res, next) => {
+          const origin = req.headers.origin
+          if (origin && allowed.includes(origin)) {
+            res.setHeader('Access-Control-Allow-Origin', origin)
+            res.setHeader('Vary', 'Origin')
+            res.setHeader('Access-Control-Allow-Credentials', 'true')
+            res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+            res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS')
+          }
+          if (req.method === 'OPTIONS') {
+            res.statusCode = 204
+            return res.end()
+          }
           if (req.url?.includes('remoteEntry.js')) {
-            console.log('🌐 CORS enabled - remoteEntry.js accessed from:', req.headers.origin || 'unknown origin')
+            console.log('🌐 remoteEntry.js request from', origin || 'unknown origin')
           }
           next()
         })
@@ -36,11 +57,13 @@ export default defineConfig({
   server: {
     port: 5001,
     strictPort: true,
-    cors: true
+    // Keep permissive cors so other assets still load; script itself handled by middleware
+    cors: false
   },
   preview: {
     port: 5001,
     strictPort: true,
-    cors: true
+    cors: false
   }
+}
 })
