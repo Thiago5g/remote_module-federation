@@ -6,8 +6,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const hostUrl = env.VITE_HOST_APP_URL || 'http://localhost:5173'
   const hostEntry = `${hostUrl}/assets/remoteEntry.js`
-
-  console.log('🔐 Allowed CORS Origin (remote):', hostUrl)
+  const allowedOrigin = env.VITE_ALLOWED_ORIGIN || 'http://localhost:5173'
 
   return {
   plugins: [
@@ -46,12 +45,12 @@ export default defineConfig(({ mode }) => {
   server: {
     port: 5001,
     strictPort: true,
-    cors: { origin: hostUrl, credentials: true }
+    cors: { origin: allowedOrigin, credentials: true }
   },
   preview: {
     port: 5001,
     strictPort: true,
-    cors: { origin: hostUrl, credentials: true }
+    cors: { origin: allowedOrigin, credentials: true }
   }
 }
 })
