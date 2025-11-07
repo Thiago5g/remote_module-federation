@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import federation from '@originjs/vite-plugin-federation'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
@@ -13,8 +12,20 @@ export default defineConfig({
         './App': './src/App.tsx',
         './Button': './src/components/Button.tsx',
       },
-      shared: ['react', 'react-dom']
-    })
+      shared: ['react', 'react-dom'],
+      
+    }),
+    {
+      name: 'cors-logger',
+      configureServer(server) {
+        server.middlewares.use((req, _res, next) => {
+          if (req.url?.includes('remoteEntry.js')) {
+            console.log('🌐 CORS enabled - remoteEntry.js accessed from:', req.headers.origin || 'unknown origin')
+          }
+          next()
+        })
+      }
+    }
   ],
   build: {
     modulePreload: false,
